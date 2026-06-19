@@ -1,175 +1,116 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سامانه Web GIS</title>
-    <style>
-        :root {
-            --primary-color: #1e3a8a; /* آبی تیره مهندسی */
-            --secondary-color: #0d9488; /* سبزآبی تعاملی نقشه‌ای */
-            --bg-color: #0f172a; /* پس‌زمینه تیره و مدرن */
-            --card-bg: #1e293b; /* رنگ کارت‌ها */
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_d0d31df23c3c95b6349849a72528bead {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
 
-        body { 
-            font-family: Tahoma, Arial, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 0; 
-        }
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
 
-        /* هدر شبیه به سامانه‌های ژئوپورتال */
-        header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-            padding: 40px 20px;
-            text-align: center;
-            border-bottom: 3px solid var(--secondary-color);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
 
-        header h1 {
-            margin: 0;
-            font-size: 28px;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
 
-        header p {
-            color: var(--text-muted);
-            font-size: 15px;
-            margin-top: 10px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-        }
-
-        .container { 
-            max-width: 900px; 
-            margin: 40px auto; 
-            padding: 0 20px;
-        }
-
-        /* استایل کارت‌های شبیه داشبوردهای GIS */
-        .card { 
-            background: var(--card-bg); 
-            border: 1px solid #334155; 
-            border-radius: 12px; 
-            padding: 25px; 
-            margin-bottom: 25px; 
-            text-align: right; 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s, border-color 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* نوار رنگی کنار کارت‌ها */
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 5px;
-            background-color: var(--secondary-color);
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: var(--secondary-color);
-        }
-
-        .card h3 { 
-            margin-top: 0; 
-            color: #fff; 
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* آیکون‌های شبیه‌سازی شده قبل از عنوان */
-        .card h3::before {
-            content: '🌐';
-            font-size: 16px;
-        }
-
-        .card p { 
-            font-size: 14px; 
-            color: var(--text-muted); 
-            line-height: 1.6;
-        }
-
-        /* دکمه‌های ناوبری نقشه */
-        .btn { 
-            display: inline-flex; 
-            align-items: center;
-            background-color: var(--secondary-color); 
-            color: white; 
-            padding: 10px 22px; 
-            text-decoration: none; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            font-size: 14px;
-            transition: background 0.3s; 
-            margin-top: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn:hover { 
-            background-color: #115e59; 
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-top: 50px;
-            border-top: 1px solid #334155;
-        }
-    </style>
+        
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
 </head>
 <body>
-
-    <header>
-        <h1>سامانه تکالیف Web GIS</h1>
-        <p>استاد گرامی، این وب‌سایت به عنوان ویترین یکپارچه  برای دسترسی تکالیف پایان‌ترم طراحی شده است. برای مشاهده ابزارها و لایه‌های هر نقشه روی دکمه تعاملی آن کلیک کنید.</p>
-    </header>
-<div class="card">
-            <h3>۱. پروژه نقشه استاتیک (اطلس آب)</h3>
-            <p>این بخش شامل طراحی اطلس آب و نقشه استاتیک است که بر اساس لایه‌های رستری و برداری پایه آماده شده و به صورت یکپارچه در ساختار وب فراخوانی می‌شود.</p>
-            <a href="Atlas_of_Water_1401-08-23-for_site/index.html" class="btn" target="_blank">🗺️ بارگذاری نقشه استاتیک</a>
-        </div>
-
-        <div class="card">
-            <h3>۲.۱. نقشه تعاملی تحت وب پایتون (Folium - فایل اول)</h3>
-            <p>توسعه‌یافته با زبان برنامه‌نویسی پایتون و کتابخانه قدرتمند Folium. این نقشه تعاملی دارای قابلیت‌های ناوبری، تغییر نقشه‌های پایه (Base Maps) و کنترل لایه‌هاست.</p>
-            <a href="folium/complete_iran_map.html" class="btn" target="_blank">⚡ اجرای محیط تعاملی پایتون</a>
-        </div>
-
-        <div class="card">
-            <h3>۲.۲. نقشه تعاملی تحت وب پایتون (Folium - فایل دوم)</h3>
-            <p>خروجی دوم و مکمل پیاده‌سازی شده در محیط پایتون جهت نمایش داده‌های توصیفی و فضایی بیشتر در بستر کتابخانه فولیم.</p>
-            <a href="folium/index.html" class="btn" target="_blank">⚡ اجرای نقشه دوم پایتون</a>
-        </div>
-
-        <div class="card">
-            <h3>۳. پروژه پایگاه داده مکانی تحت وب (qgis2web)</h3>
-            <p>خروجی مستقیم از لایه‌های وکتوری نرم‌افزار QGIS با استفاده از متدهای جاوااسکریپت (OpenLayers/Leaflet). کاملاً بهینه‌سازی شده برای وب با قابلیت جستجو و پرس‌وجوی مکانی لایه‌ها.</p>
-            <a href="qgis2web_2026_06_14-19_47_24_843132/index.html" class="btn" target="_blank">🔍 بارگذاری پنل مدیریت QGIS</a>
-        </div>
-
-    </div>
-
-    <footer>
-        طراحی و یکپارچه‌سازی - درس Web GIS | سال ۱۴۰۵
-    </footer>
-
+    
+    
+            <div class="folium-map" id="map_d0d31df23c3c95b6349849a72528bead" ></div>
+        
 </body>
+<script>
+    
+    
+            var map_d0d31df23c3c95b6349849a72528bead = L.map(
+                "map_d0d31df23c3c95b6349849a72528bead",
+                {
+                    center: [35.6892, 51.389],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_9602cf1c3429ac5099b50905e357547d = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_9602cf1c3429ac5099b50905e357547d.addTo(map_d0d31df23c3c95b6349849a72528bead);
+        
+    
+            var heat_map_a5a1222c9ce10404c002164545c6f932 = L.heatLayer(
+                [[35.6892, 51.389, 0.9], [35.7, 51.39, 0.3], [35.71, 51.4, 0.6]],
+                {
+  "minOpacity": 0.5,
+  "maxZoom": 18,
+  "radius": 20,
+  "blur": 15,
+}
+            );
+        
+    
+            heat_map_a5a1222c9ce10404c002164545c6f932.addTo(map_d0d31df23c3c95b6349849a72528bead);
+        
+</script>
 </html>
